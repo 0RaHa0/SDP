@@ -1,1 +1,214 @@
+// CinemaManagement.java
+package cinema;
 
+public class CinemaManagement {
+    public static void main(String[] args) {
+        CinemaConfig config = CinemaConfig.getInstance();
+        config.setCinemaName("Starlight Cinemas");
+        System.out.println("Cinema Name: " + config.getCinemaName());
+
+        MovieFactory regularFactory = new RegularMovieFactory();
+        Movie movie = regularFactory.createMovie("Inception");
+        System.out.println("Movie: " + movie.getTitle() + ", Type: " + movie.getType());
+
+        UIFactory uiFactory = new DarkThemeFactory();
+        Button button = uiFactory.createButton();
+        button.render();
+
+        TicketBooking booking = new TicketBooking.TicketBookingBuilder()
+                .setMovieTitle("Inception")
+                .setSeatNumber("A1")
+                .setSnackCombo("Popcorn and Soda")
+                .build();
+        System.out.println("Ticket booked for: " + booking.movieTitle);
+
+        StandardSchedule template = new StandardSchedule();
+        template.setTime("18:00");
+        MovieSchedule eveningSchedule = template.clone();
+        eveningSchedule.setMovie(movie);
+        System.out.println("Movie: " + eveningSchedule.getMovie().getTitle() + ", Schedule: " + template.getTime());
+
+        System.out.println("Cinema Management System initialized.");
+    }
+}
+
+// CinemaConfig.java
+package cinema;
+
+class CinemaConfig {
+    private static CinemaConfig instance;
+    private String cinemaName;
+
+    private CinemaConfig() {}
+
+    public static CinemaConfig getInstance() {
+        if (instance == null) {
+            instance = new CinemaConfig();
+        }
+        return instance;
+    }
+
+    public void setCinemaName(String name) {
+        this.cinemaName = name;
+    }
+
+    public String getCinemaName() {
+        return this.cinemaName;
+    }
+}
+
+// Movie.java
+package cinema;
+
+interface Movie {
+    String getTitle();
+    String getType();
+}
+
+class RegularMovie implements Movie {
+    private String title;
+    public RegularMovie(String title) {
+        this.title = title;
+    }
+    public String getTitle() { return this.title; }
+    public String getType() { return "Regular"; }
+}
+
+class IMAXMovie implements Movie {
+    private String title;
+    public IMAXMovie(String title) {
+        this.title = title;
+    }
+    public String getTitle() { return this.title; }
+    public String getType() { return "IMAX"; }
+}
+
+abstract class MovieFactory {
+    public abstract Movie createMovie(String title);
+}
+
+class RegularMovieFactory extends MovieFactory {
+    public Movie createMovie(String title) {
+        return new RegularMovie(title);
+    }
+}
+
+class IMAXMovieFactory extends MovieFactory {
+    public Movie createMovie(String title) {
+        return new IMAXMovie(title);
+    }
+}
+
+// TicketBooking.java
+package cinema;
+
+class TicketBooking {
+    String movieTitle;
+    String seatNumber;
+    String snackCombo;
+
+    private TicketBooking(TicketBookingBuilder builder) {
+        this.movieTitle = builder.movieTitle;
+        this.seatNumber = builder.seatNumber;
+        this.snackCombo = builder.snackCombo;
+    }
+
+    public static class TicketBookingBuilder {
+        private String movieTitle;
+        private String seatNumber;
+        private String snackCombo;
+
+        public TicketBookingBuilder setMovieTitle(String title) {
+            this.movieTitle = title;
+            return this;
+        }
+
+        public TicketBookingBuilder setSeatNumber(String seat) {
+            this.seatNumber = seat;
+            return this;
+        }
+
+        public TicketBookingBuilder setSnackCombo(String combo) {
+            this.snackCombo = combo;
+            return this;
+        }
+
+        public TicketBooking build() {
+            return new TicketBooking(this);
+        }
+    }
+}
+
+// MovieSchedule.java
+package cinema;
+
+interface MovieSchedule extends Cloneable {
+    MovieSchedule clone();
+    void setMovie(Movie movie);
+    String getTime();
+    Movie getMovie();
+}
+
+class StandardSchedule implements MovieSchedule {
+    private String time;
+    private Movie movie;
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+
+    public MovieSchedule clone() {
+        try {
+            return (MovieSchedule) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getTime() {
+        return this.time;
+    }
+
+    public Movie getMovie() {
+        return this.movie;
+    }
+}
+// Button.java
+package cinema;
+
+interface Button {
+    void render();
+}
+
+class DarkThemeButton implements Button {
+    public void render() {
+        System.out.println("Rendering dark theme button.");
+    }
+}
+
+class LightThemeButton implements Button {
+    public void render() {
+        System.out.println("Rendering light theme button.");
+    }
+}
+
+interface UIFactory {
+    Button createButton();
+}
+
+class DarkThemeFactory implements UIFactory {
+    public Button createButton() {
+        return new DarkThemeButton();
+    }
+}
+
+class LightThemeFactory implements UIFactory {
+    public Button createButton() {
+        return new LightThemeButton();
+    }
+}
