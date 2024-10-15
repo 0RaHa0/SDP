@@ -1,0 +1,625 @@
+Assignment_3
+
+Task_1
+
+package Assignment_3_1;
+
+interface AACPlayer {
+    void playAAC(String fileName);
+}
+package Assignment_3_1;
+
+class AdvancedAudioPlayer implements WAVPlayer, AACPlayer {
+    @Override
+    public void playWAV(String fileName) {
+        System.out.println("Playing WAV file. Name: " + fileName);
+    }
+
+    @Override
+    public void playAAC(String fileName) {
+        System.out.println("Playing AAC file. Name: " + fileName);
+    }
+}
+package Assignment_3_1;
+
+class AudioAdapter implements AudioPlayer {
+    AdvancedAudioPlayer advancedAudioPlayer;
+
+    public AudioAdapter(String audioType) {
+        if(audioType.equalsIgnoreCase("wav")) {
+            advancedAudioPlayer = new AdvancedAudioPlayer();
+        } else if(audioType.equalsIgnoreCase("aac")) {
+            advancedAudioPlayer = new AdvancedAudioPlayer();
+        }
+    }
+
+    @Override
+    public void play(String audioType, String fileName) {
+        if(audioType.equalsIgnoreCase("wav")) {
+            advancedAudioPlayer.playWAV(fileName);
+        } else if(audioType.equalsIgnoreCase("aac")) {
+            advancedAudioPlayer.playAAC(fileName);
+        }
+    }
+}
+package Assignment_3_1;
+
+interface AudioPlayer {
+    void play(String audioType, String fileName);
+}
+package Assignment_3_1;
+
+class MP3Player implements AudioPlayer {
+    @Override
+    public void play(String audioType, String fileName) {
+        if(audioType.equalsIgnoreCase("mp3")) {
+            System.out.println("Playing MP3 file. Name: " + fileName);
+        } else {
+            System.out.println("Invalid media type.");
+        }
+    }
+}
+package Assignment_3_1;
+
+class MusicPlayerApp {
+    public static void main(String[] args) {
+        AudioPlayer player = new MP3Player();
+        player.play("mp3", "song1.mp3");
+
+        AudioPlayer adapter = new AudioAdapter("wav");
+        adapter.play("wav", "song2.wav");
+
+        adapter = new AudioAdapter("aac");
+        adapter.play("aac", "song3.aac");
+    }
+}
+package Assignment_3_1;
+
+interface WAVPlayer {
+    void playWAV(String fileName);
+}
+
+Task_2
+
+package Assignment_3_2;
+
+class AdvancedRemote extends RemoteControl {
+    public AdvancedRemote(Device device) {
+        super(device);
+    }
+
+    @Override
+    public void turnOn() {
+        device.powerOn();
+    }
+
+    @Override
+    public void turnOff() {
+        device.powerOff();
+    }
+
+    public void setChannel(int channel) {
+        device.setChannel(channel);
+    }
+
+    public void setVolume(int volume) {
+        device.setVolume(volume);
+    }
+}
+package Assignment_3_2;
+
+class BasicRemote extends RemoteControl {
+    public BasicRemote(Device device) { super(device); }
+    @Override
+    public void turnOn() { device.powerOn(); }
+    @Override
+    public void turnOff() { device.powerOff(); }
+}
+package Assignment_3_2;
+
+interface Device {
+    void powerOn();
+    void powerOff();
+    void setChannel(int channel);
+    void setVolume(int volume);
+}
+package Assignment_3_2;
+
+class HomeEntertainmentSystem {
+    public static void main(String[] args) {
+        Device tv = new TVDevice();
+        RemoteControl remote = new BasicRemote(tv);
+        remote.turnOn();
+        remote.turnOff();
+
+        remote = new AdvancedRemote(tv);
+        remote.turnOn();
+        ((AdvancedRemote) remote).setChannel(5);
+        remote.turnOff();
+    }
+}
+package Assignment_3_2;
+
+abstract class RemoteControl {
+    protected Device device;
+
+    public RemoteControl(Device device) {
+        this.device = device;
+    }
+
+    public abstract void turnOn();
+    public abstract void turnOff();
+}
+package Assignment_3_2;
+
+class TVDevice implements Device {
+    @Override
+    public void powerOn() { System.out.println("TV: Power ON"); }
+    @Override
+    public void powerOff() { System.out.println("TV: Power OFF"); }
+    @Override
+    public void setChannel(int channel) { System.out.println("TV: Set Channel to " + channel); }
+    @Override
+    public void setVolume(int volume) { System.out.println("TV: Set Volume to " + volume); }
+}
+
+Task_3
+
+package Assignment_3_3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Menu extends MenuComponent {
+    List<MenuComponent> menuComponents = new ArrayList<>();
+    String name;
+    String description;
+
+    public Menu(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    @Override
+    public void add(MenuComponent menuComponent) {
+        menuComponents.add(menuComponent);
+    }
+
+    @Override
+    public void remove(MenuComponent menuComponent) {
+        menuComponents.remove(menuComponent);
+    }
+
+    @Override
+    public MenuComponent getChild(int i) {
+        return menuComponents.get(i);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void print() {
+        System.out.println("\n" + getName() + ", " + getDescription());
+        System.out.println("---------------------");
+
+        for (MenuComponent menuComponent : menuComponents) {
+            menuComponent.print();
+        }
+    }
+}
+package Assignment_3_3;
+
+public abstract class MenuComponent {
+    public void add(MenuComponent menuComponent) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void remove(MenuComponent menuComponent) {
+        throw new UnsupportedOperationException();
+    }
+
+    public MenuComponent getChild(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    public String getName() {
+        throw new UnsupportedOperationException();
+    }
+
+    public String getDescription() {
+        throw new UnsupportedOperationException();
+    }
+
+    public double getPrice() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void print() {
+        throw new UnsupportedOperationException();
+    }
+}
+package Assignment_3_3;
+
+class MenuItem extends MenuComponent {
+    String name;
+    String description;
+    double price;
+
+    public MenuItem(String name, String description, double price) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
+
+    @Override
+    public String getName() { return name; }
+    @Override
+    public String getDescription() { return description; }
+    @Override
+    public double getPrice() { return price; }
+    @Override
+    public void print() {
+        System.out.println(getName() + " -- " + getDescription() + " -- $" + getPrice());
+    }
+}
+package Assignment_3_3;
+
+public class RestaurantApp {
+    public static void main(String[] args) {
+        MenuComponent breakfastMenu = new Menu("Breakfast", "Morning Menu");
+        MenuComponent lunchMenu = new Menu("Lunch", "Afternoon Menu");
+        MenuComponent dinnerMenu = new Menu("Dinner", "Evening Menu");
+
+        MenuComponent allMenus = new Menu("ALL MENUS", "All available menus");
+        allMenus.add(breakfastMenu);
+        allMenus.add(lunchMenu);
+        allMenus.add(dinnerMenu);
+
+        breakfastMenu.add(new MenuItem("Pancakes", "Pancakes with syrup", 5.99));
+        lunchMenu.add(new MenuItem("Burger", "Cheeseburger with fries", 8.99));
+        dinnerMenu.add(new MenuItem("Steak", "Grilled steak with vegetables", 14.99));
+
+        allMenus.print();
+    }
+}
+
+Task_4
+
+package Assignment_3_4;
+
+class MargheritaPizza implements Pizza {
+    @Override
+    public String getDescription() {
+        return "Margherita Pizza";
+    }
+
+    @Override
+    public double getCost() {
+        return 6.00;
+    }
+}
+package Assignment_3_4;
+
+interface Pizza {
+    String getDescription();
+    double getCost();
+}
+package Assignment_3_4;
+
+public class PizzaShop {
+    public static void main(String[] args) {
+        Pizza pizza = new MargheritaPizza();
+        System.out.println(pizza.getDescription() + " Cost: $" + pizza.getCost());
+
+        pizza = new CheeseTopping(pizza);
+        pizza = new MushroomTopping(pizza);
+        System.out.println(pizza.getDescription() + " Cost: $" + pizza.getCost());
+    }
+}
+package Assignment_3_4;
+
+abstract class ToppingDecorator implements Pizza {
+    protected Pizza pizza;
+
+    public ToppingDecorator(Pizza pizza) {
+        this.pizza = pizza;
+    }
+
+    @Override
+    public String getDescription() {
+        return pizza.getDescription();
+    }
+
+    @Override
+    public double getCost() {
+        return pizza.getCost();
+    }
+}
+package Assignment_3_4;
+
+class CheeseTopping extends ToppingDecorator {
+    public CheeseTopping(Pizza pizza) {
+        super(pizza);
+    }
+
+    @Override
+    public String getDescription() {
+        return pizza.getDescription() + ", Cheese";
+    }
+
+    @Override
+    public double getCost() {
+        return pizza.getCost() + 1.25;
+    }
+}
+
+class MushroomTopping extends ToppingDecorator {
+    public MushroomTopping(Pizza pizza) {
+        super(pizza);
+    }
+
+    @Override
+    public String getDescription() {
+        return pizza.getDescription() + ", Mushrooms";
+    }
+
+    @Override
+    public double getCost() {
+        return pizza.getCost() + 0.75;
+    }
+}
+class CheeseTopping extends ToppingDecorator {
+    public CheeseTopping(Pizza pizza) {
+        super(pizza);
+    }
+
+    @Override
+    public String getDescription() {
+        return pizza.getDescription() + ", Cheese";
+    }
+
+    @Override
+    public double getCost() {
+        return pizza.getCost() + 1.25;
+    }
+}
+
+class MushroomTopping extends ToppingDecorator {
+    public MushroomTopping(Pizza pizza) {
+        super(pizza);
+    }
+
+    @Override
+    public String getDescription() {
+        return pizza.getDescription() + ", Mushrooms";
+    }
+
+    @Override
+    public double getCost() {
+        return pizza.getCost() + 0.75;
+    }
+}
+
+Task_5
+
+package Assignment_3_5;
+
+class Light {
+    public void turnOn() { System.out.println("Light is on"); }
+    public void turnOff() { System.out.println("Light is off"); }
+}
+
+class Thermostat {
+    public void setTemperature(int temperature) { System.out.println("Thermostat set to " + temperature + " degrees"); }
+}
+
+class SecuritySystem {
+    public void arm() { System.out.println("Security system armed"); }
+    public void disarm() { System.out.println("Security system disarmed"); }
+}
+package Assignment_3_5;
+
+class Light {
+    public void turnOn() { System.out.println("Light is on"); }
+    public void turnOff() { System.out.println("Light is off"); }
+}
+
+class Thermostat {
+    public void setTemperature(int temperature) { System.out.println("Thermostat set to " + temperature + " degrees"); }
+}
+
+class SecuritySystem {
+    public void arm() { System.out.println("Security system armed"); }
+    public void disarm() { System.out.println("Security system disarmed"); }
+}
+package Assignment_3_5;
+
+class Light {
+    public void turnOn() { System.out.println("Light is on"); }
+    public void turnOff() { System.out.println("Light is off"); }
+}
+
+class Thermostat {
+    public void setTemperature(int temperature) { System.out.println("Thermostat set to " + temperature + " degrees"); }
+}
+
+class SecuritySystem {
+    public void arm() { System.out.println("Security system armed"); }
+    public void disarm() { System.out.println("Security system disarmed"); }
+}
+package Assignment_3_5;
+
+public class SmartHomeApp {
+    public static void main(String[] args) {
+        SmartHomeFacade smartHome = new SmartHomeFacade();
+        smartHome.leaveHome();
+        smartHome.arriveHome();
+    }
+}
+package Assignment_3_5;
+
+class SmartHomeFacade {
+    private Light light;
+    private Thermostat thermostat;
+    private SecuritySystem securitySystem;
+
+    public SmartHomeFacade() {
+        this.light = new Light();
+        this.thermostat = new Thermostat();
+        this.securitySystem = new SecuritySystem();
+    }
+
+    public void leaveHome() {
+        light.turnOff();
+        thermostat.setTemperature(18);
+        securitySystem.arm();
+        System.out.println("Left home mode activated.");
+    }
+
+    public void arriveHome() {
+        light.turnOn();
+        thermostat.setTemperature(22);
+        securitySystem.disarm();
+        System.out.println("Arrived home mode activated.");
+    }
+}
+
+Task_6
+
+package Assignment_3_6;
+
+import java.util.HashMap;
+import java.util.Map;
+
+class CharacterFactory {
+    private Map<Character, TextCharacter> characterMap = new HashMap<>();
+
+    public TextCharacter getCharacter(char symbol, String font, int size) {
+        TextCharacter character = characterMap.get(symbol);
+        if (character == null) {
+            character = new TextCharacter(symbol, font, size);
+            characterMap.put(symbol, character);
+            System.out.println("Creating character: " + symbol);
+        }
+        return character;
+    }
+}
+package Assignment_3_6;
+
+public class TextCharacter {
+    private char symbol;
+    private String font;
+    private int size;
+
+    public TextCharacter(char symbol, String font, int size) {
+        this.symbol = symbol;
+        this.font = font;
+        this.size = size;
+    }
+    public void render(int x, int y) {
+        System.out.println("Rendering '" + symbol + "' at position (" + x + ", " + y + ") with font: " + font + " and size: " + size);
+    }
+
+}
+package Assignment_3_6;
+
+class TextEditor {
+    private CharacterFactory characterFactory = new CharacterFactory();
+
+    public void renderText(String text) {
+        int x = 0;
+        int y = 0;
+        for (char c : text.toCharArray()) {
+            TextCharacter character = characterFactory.getCharacter(c, "Arial", 12);
+            character.render(x++, y);
+        }
+    }
+}
+package Assignment_3_6;
+
+public class TextEditorApp {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        editor.renderText("HELLO");
+        editor.renderText("WORLD");
+    }
+}
+
+Task_7
+
+package Assignment_3_7;
+
+public class LearningPlatformApp {
+    public static void main(String[] args) {
+        VideoLecture video1 = new ProxyVideoLecture("Design Patterns Lecture 1");
+        VideoLecture video2 = new ProxyVideoLecture("Design Patterns Lecture 2");
+
+        video1.getInfo();
+        video1.play();
+
+        video2.getInfo();
+        video2.play();
+    }
+}
+package Assignment_3_7;
+
+class ProxyVideoLecture implements VideoLecture {
+    private RealVideoLecture realVideoLecture;
+    private String title;
+
+    public ProxyVideoLecture(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public void getInfo() {
+        System.out.println("Title: " + title);
+    }
+
+    @Override
+    public void play() {
+        if (realVideoLecture == null) {
+            realVideoLecture = new RealVideoLecture(title);
+        }
+        realVideoLecture.play();
+    }
+}
+package Assignment_3_7;
+
+class RealVideoLecture implements VideoLecture {
+    private String title;
+
+    public RealVideoLecture(String title) {
+        this.title = title;
+        load();
+    }
+
+    private void load() {
+        System.out.println("Loading video lecture: " + title);
+    }
+
+    @Override
+    public void getInfo() {
+        System.out.println("Title: " + title);
+    }
+
+    @Override
+    public void play() {
+        System.out.println("Playing video: " + title);
+    }
+}
+package Assignment_3_7;
+
+interface VideoLecture {
+    void getInfo();
+    void play();
+}
+
