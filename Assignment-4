@@ -1,0 +1,790 @@
+Assignment-4
+package Task_41;
+
+class CreditCardPayment implements PaymentStrategy {
+    public void processPayment(double amount) {
+        System.out.println("Paid " + amount + " using Credit Card.");
+    }
+}
+
+class PayPalPayment implements PaymentStrategy {
+    public void processPayment(double amount) {
+        System.out.println("Paid " + amount + " using PayPal.");
+    }
+}
+
+class CryptoPayment implements PaymentStrategy {
+    public void processPayment(double amount) {
+        System.out.println("Paid " + amount + " using Cryptocurrency.");
+    }
+}
+package Task_41;
+
+public class Main {
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart();
+
+        cart.setPaymentStrategy(new CreditCardPayment());
+        cart.checkout(100);
+
+        cart.setPaymentStrategy(new PayPalPayment());
+        cart.checkout(200);
+
+        cart.setPaymentStrategy(new CryptoPayment());
+        cart.checkout(300);
+    }
+}
+package Task_41;
+
+interface PaymentStrategy {
+    void processPayment(double amount);
+}
+package Task_41;
+
+class ShoppingCart {
+    private PaymentStrategy paymentStrategy;
+
+    public void setPaymentStrategy(PaymentStrategy paymentStrategy) {
+        this.paymentStrategy = paymentStrategy;
+    }
+
+    public void checkout(double amount) {
+        paymentStrategy.processPayment(amount);
+    }
+}
+
+package Task_42;
+
+class CurrentConditionsDisplay implements WeatherDisplay {
+    public void update(double temperature, double humidity, double pressure) {
+        System.out.println("Current conditions: " + temperature + "C degrees, " + humidity + "% humidity");
+    }
+}
+
+class StatisticsDisplay implements WeatherDisplay {
+    public void update(double temperature, double humidity, double pressure) {
+        System.out.println("Statistics: Temp: " + temperature + "C, Humidity: " + humidity + "%");
+    }
+}
+
+class ForecastDisplay implements WeatherDisplay {
+    public void update(double temperature, double humidity, double pressure) {
+        System.out.println("Forecast: Pressure is " + pressure + " hPa");
+    }
+}
+package Task_42;
+
+public class Main {
+    public static void main(String[] args) {
+        WeatherStation station = new WeatherStation();
+
+        CurrentConditionsDisplay currentDisplay = new CurrentConditionsDisplay();
+        StatisticsDisplay statsDisplay = new StatisticsDisplay();
+        ForecastDisplay forecastDisplay = new ForecastDisplay();
+
+        station.addDisplay(currentDisplay);
+        station.addDisplay(statsDisplay);
+        station.addDisplay(forecastDisplay);
+
+        station.setWeatherData(25, 65, 1013);
+        station.setWeatherData(28, 70, 1010);
+    }
+}
+package Task_42;
+
+interface WeatherDisplay {
+    void update(double temperature, double humidity, double pressure);
+}
+package Task_42;
+
+import java.util.List;
+import java.util.ArrayList;
+
+class WeatherStation {
+    private List<WeatherDisplay> displays = new ArrayList<>();
+    private double temperature;
+    private double humidity;
+    private double pressure;
+
+    public void addDisplay(WeatherDisplay display) {
+        displays.add(display);
+    }
+
+    public void removeDisplay(WeatherDisplay display) {
+        displays.remove(display);
+    }
+
+    public void setWeatherData(double temperature, double humidity, double pressure) {
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        notifyDisplays();
+    }
+
+    private void notifyDisplays() {
+        for (WeatherDisplay display : displays) {
+            display.update(temperature, humidity, pressure);
+        }
+    }
+}
+
+package Task_43;
+
+interface Command {
+    void execute();
+    void undo();
+}
+package Task_43;
+
+class TurnTVOn implements Command {
+    TV tv;
+
+    public TurnTVOn(TV tv) {
+        this.tv = tv;
+    }
+
+    public void execute() {
+        tv.on();
+    }
+
+    public void undo() {
+        tv.off();
+    }
+}
+
+class DimLights implements Command {
+    Light light;
+
+    public DimLights(Light light) {
+        this.light = light;
+    }
+
+    public void execute() {
+        light.dim();
+    }
+
+    public void undo() {
+        light.bright();
+    }
+}
+package Task_43;
+
+public class Main {
+    public static void main(String[] args) {
+        RemoteControl remote = new RemoteControl();
+
+        TV tv = new TV();
+        Light light = new Light();
+
+        TurnTVOn tvOnCommand = new TurnTVOn(tv);
+        DimLights dimLightsCommand = new DimLights(light);
+
+        remote.setCommand(0, tvOnCommand);
+        remote.setCommand(1, dimLightsCommand);
+
+        remote.pressButton(0);
+        remote.pressButton(1);
+
+        remote.pressUndo();
+        remote.pressUndo();
+    }
+}
+package Task_43;
+
+class TV {
+    public void on() {
+        System.out.println("TV is ON");
+    }
+
+    public void off() {
+        System.out.println("TV is OFF");
+    }
+}
+
+class Light {
+    public void dim() {
+        System.out.println("Lights are dimmed");
+    }
+
+    public void bright() {
+        System.out.println("Lights are bright");
+    }
+}
+package Task_43;
+
+class RemoteControl {
+    private Command[] slots;
+    private Command lastCommand;
+
+    public RemoteControl() {
+        slots = new Command[5];
+    }
+
+    public void setCommand(int slot, Command command) {
+        slots[slot] = command;
+    }
+
+    public void pressButton(int slot) {
+        slots[slot].execute();
+        lastCommand = slots[slot];
+    }
+
+    public void pressUndo() {
+        lastCommand.undo();
+    }
+}
+package Task_44;
+
+class NewOrderState implements OrderState {
+    public void payOrder(Order order) {
+        System.out.println("Order is paid.");
+        order.setState(new PaidOrderState());
+    }
+
+    public void shipOrder(Order order) {
+        System.out.println("Cannot ship, order is not paid.");
+    }
+
+    public void deliverOrder(Order order) {
+        System.out.println("Cannot deliver, order is not shipped.");
+    }
+
+    public void cancelOrder(Order order) {
+        System.out.println("Order is cancelled.");
+        order.setState(new CancelledOrderState());
+    }
+}
+
+class PaidOrderState implements OrderState {
+    public void payOrder(Order order) {
+        System.out.println("Order is already paid.");
+    }
+
+    public void shipOrder(Order order) {
+        System.out.println("Order is shipped.");
+        order.setState(new ShippedOrderState());
+    }
+
+    public void deliverOrder(Order order) {
+        System.out.println("Cannot deliver, order is not shipped.");
+    }
+
+    public void cancelOrder(Order order) {
+        System.out.println("Order is cancelled.");
+        order.setState(new CancelledOrderState());
+    }
+}
+
+class ShippedOrderState implements OrderState {
+    public void payOrder(Order order) {
+        System.out.println("Order is already paid.");
+    }
+
+    public void shipOrder(Order order) {
+        System.out.println("Order is already shipped.");
+    }
+
+    public void deliverOrder(Order order) {
+        System.out.println("Order is delivered.");
+        order.setState(new DeliveredOrderState());
+    }
+
+    public void cancelOrder(Order order) {
+        System.out.println("Cannot cancel, order is already shipped.");
+    }
+}
+
+class DeliveredOrderState implements OrderState {
+    public void payOrder(Order order) {
+        System.out.println("Order is already paid.");
+    }
+
+    public void shipOrder(Order order) {
+        System.out.println("Order is already shipped.");
+    }
+
+    public void deliverOrder(Order order) {
+        System.out.println("Order is already delivered.");
+    }
+
+    public void cancelOrder(Order order) {
+        System.out.println("Cannot cancel, order is already delivered.");
+    }
+}
+
+class CancelledOrderState implements OrderState {
+    public void payOrder(Order order) {
+        System.out.println("Order is cancelled.");
+    }
+
+    public void shipOrder(Order order) {
+        System.out.println("Order is cancelled.");
+    }
+
+    public void deliverOrder(Order order) {
+        System.out.println("Order is cancelled.");
+    }
+
+    public void cancelOrder(Order order) {
+        System.out.println("Order is already cancelled.");
+    }
+}
+package Task_44;
+
+public class Main {
+    public static void main(String[] args) {
+        Order order = new Order();
+
+        order.payOrder();
+        order.shipOrder();
+        order.deliverOrder();
+        order.cancelOrder();
+    }
+}
+package Task_44;
+
+class Order {
+    private OrderState state;
+
+    public Order() {
+        state = new NewOrderState();
+    }
+
+    public void setState(OrderState state) {
+        this.state = state;
+    }
+
+    public void payOrder() {
+        state.payOrder(this);
+    }
+
+    public void shipOrder() {
+        state.shipOrder(this);
+    }
+
+    public void deliverOrder() {
+        state.deliverOrder(this);
+    }
+
+    public void cancelOrder() {
+        state.cancelOrder(this);
+    }
+}
+package Task_44;
+
+interface OrderState {
+    void payOrder(Order order);
+    void shipOrder(Order order);
+    void deliverOrder(Order order);
+    void cancelOrder(Order order);
+}
+package Task_45;
+
+abstract class Approver {
+    protected Approver nextApprover;
+
+    public void setNextApprover(Approver approver) {
+        this.nextApprover = approver;
+    }
+
+    public abstract void approveExpense(ExpenseRequest request);
+}
+package Task_45;
+
+class TeamLead extends Approver {
+    public void approveExpense(ExpenseRequest request) {
+        if (request.getAmount() < 1000) {
+            System.out.println("TeamLead approved expense of " + request.getAmount());
+        } else if (nextApprover != null) {
+            nextApprover.approveExpense(request);
+        }
+    }
+}
+
+class Manager extends Approver {
+    public void approveExpense(ExpenseRequest request) {
+        if (request.getAmount() < 5000) {
+            System.out.println("Manager approved expense of " + request.getAmount());
+        } else if (nextApprover != null) {
+            nextApprover.approveExpense(request);
+        }
+    }
+}
+
+class Director extends Approver {
+    public void approveExpense(ExpenseRequest request) {
+        if (request.getAmount() < 10000) {
+            System.out.println("Director approved expense of " + request.getAmount());
+        } else if (nextApprover != null) {
+            nextApprover.approveExpense(request);
+        }
+    }
+}
+
+class CEO extends Approver {
+    public void approveExpense(ExpenseRequest request) {
+        System.out.println("CEO approved expense of " + request.getAmount());
+    }
+}
+package Task_45;
+
+class ExpenseRequest {
+    private double amount;
+
+    public ExpenseRequest(double amount) {
+        this.amount = amount;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+}
+package Task_45;
+
+public class Main {
+    public static void main(String[] args) {
+        Approver teamLead = new TeamLead();
+        Approver manager = new Manager();
+        Approver director = new Director();
+        Approver ceo = new CEO();
+
+        teamLead.setNextApprover(manager);
+        manager.setNextApprover(director);
+        director.setNextApprover(ceo);
+
+        ExpenseRequest request1 = new ExpenseRequest(500);
+        ExpenseRequest request2 = new ExpenseRequest(4000);
+        ExpenseRequest request3 = new ExpenseRequest(8000);
+        ExpenseRequest request4 = new ExpenseRequest(20000);
+
+        teamLead.approveExpense(request1);
+        teamLead.approveExpense(request2);
+        teamLead.approveExpense(request3);
+        teamLead.approveExpense(request4);
+    }
+}
+package Task_46;
+
+interface ChatMediator {
+    void sendMessage(String message, User user);
+    void addUser(User user);
+}
+package Task_46;
+
+import java.util.List;
+import java.util.ArrayList;
+
+class ChatRoom implements ChatMediator {
+    private List<User> users = new ArrayList<>();
+
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    public void sendMessage(String message, User user) {
+        for (User u : users) {
+            if (u != user) {
+                u.receive(message);
+            }
+        }
+    }
+}
+package Task_46;
+
+class RegularUser extends User {
+    public RegularUser(ChatMediator mediator, String name) {
+        super(mediator, name);
+    }
+
+    public void send(String message) {
+        System.out.println(this.name + " sends: " + message);
+        mediator.sendMessage(message, this);
+    }
+
+    public void receive(String message) {
+        System.out.println(this.name + " received: " + message);
+    }
+}
+
+class PremiumUser extends User {
+    public PremiumUser(ChatMediator mediator, String name) {
+        super(mediator, name);
+    }
+
+    public void send(String message) {
+        System.out.println(this.name + " sends: " + message);
+        mediator.sendMessage(message, this);
+    }
+
+    public void receive(String message) {
+        System.out.println(this.name + " received: " + message);
+    }
+}
+package Task_46;
+
+public class Main {
+    public static void main(String[] args) {
+        ChatMediator chatRoom = new ChatRoom();
+
+        User user1 = new RegularUser(chatRoom, "Alice");
+        User user2 = new PremiumUser(chatRoom, "Bob");
+        User user3 = new RegularUser(chatRoom, "Charlie");
+
+        chatRoom.addUser(user1);
+        chatRoom.addUser(user2);
+        chatRoom.addUser(user3);
+
+        user1.send("Hi everyone!");
+        user2.send("Hello Alice!");
+    }
+}
+package Task_46;
+
+abstract class User {
+    protected ChatMediator mediator;
+    protected String name;
+
+    public User(ChatMediator mediator, String name) {
+        this.mediator = mediator;
+        this.name = name;
+    }
+
+    public abstract void send(String message);
+    public abstract void receive(String message);
+}
+package Task_47;
+
+import java.util.List;
+import java.util.ArrayList;
+
+class FacebookProfileCollection implements SocialMediaProfileCollection {
+    private List<Profile> profiles = new ArrayList<>();
+
+    public void addProfile(Profile profile) {
+        profiles.add(profile);
+    }
+
+    public ProfileIterator createIterator() {
+        return new FacebookProfileIterator(profiles);
+    }
+}
+package Task_47;
+
+public class Main {
+    public static void main(String[] args) {
+        FacebookProfileCollection fbCollection = new FacebookProfileCollection();
+
+        fbCollection.addProfile(new Profile("Alice"));
+        fbCollection.addProfile(new Profile("Bob"));
+        fbCollection.addProfile(new Profile("Charlie"));
+
+        ProfileIterator iterator = fbCollection.createIterator();
+
+        while (iterator.hasNext()) {
+            Profile profile = iterator.next();
+            System.out.println("Profile: " + profile.getName());
+        }
+    }
+}
+package Task_47;
+
+class Profile {
+    private String name;
+
+    public Profile(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+package Task_47;
+
+interface ProfileIterator {
+    boolean hasNext();
+    Profile next();
+}
+package Task_47;
+
+interface SocialMediaProfileCollection {
+    ProfileIterator createIterator();
+}
+package Task_48;
+
+class WordDocument implements Document {
+    public void accept(DocumentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public void exportToWord() {
+        System.out.println("Exporting Word Document...");
+    }
+}
+
+class PDFDocument implements Document {
+    public void accept(DocumentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public void exportToPDF() {
+        System.out.println("Exporting PDF Document...");
+    }
+}
+package Task_48;
+
+class DocumentExportVisitor implements DocumentVisitor {
+    public void visit(WordDocument doc) {
+        doc.exportToWord();
+    }
+
+    public void visit(PDFDocument doc) {
+        doc.exportToPDF();
+    }
+}
+package Task_48;
+
+interface DocumentVisitor {
+    void visit(WordDocument doc);
+    void visit(PDFDocument doc);
+}
+package Task_48;
+
+public class Main {
+    public static void main(String[] args) {
+        Document wordDoc = new WordDocument();
+        Document pdfDoc = new PDFDocument();
+
+        DocumentVisitor exportVisitor = new DocumentExportVisitor();
+
+        wordDoc.accept(exportVisitor);
+        pdfDoc.accept(exportVisitor);
+    }
+}
+package Task_48;
+
+interface Document {
+    void accept(DocumentVisitor visitor);
+}
+package Task_49;
+
+class Chess extends Game {
+    void startGame() {
+        System.out.println("Chess Game Started.");
+    }
+
+    void playGame() {
+        System.out.println("Playing Chess...");
+    }
+
+    void endGame() {
+        System.out.println("Chess Game Ended.");
+    }
+}
+package Task_49;
+
+class Soccer extends Game {
+    void startGame() {
+        System.out.println("Soccer Game Started.");
+    }
+
+    void playGame() {
+        System.out.println("Playing Soccer...");
+    }
+
+    void endGame() {
+        System.out.println("Soccer Game Ended.");
+    }
+}
+package Task_49;
+
+abstract class Game {
+    public final void play() {
+        startGame();
+        playGame();
+        endGame();
+    }
+
+    abstract void startGame();
+    abstract void playGame();
+    abstract void endGame();
+}
+package Task_49;
+
+public class Main {
+    public static void main(String[] args) {
+        Game soccer = new Soccer();
+        Game chess = new Chess();
+
+        soccer.play();
+        chess.play();
+    }
+}
+package Task_410;
+
+import java.util.Stack;
+
+class TextEditorHistory {
+    private Stack<TextMemento> history = new Stack<>();
+
+    public void save(TextEditor editor) {
+        history.push(editor.save());
+    }
+
+    public void undo(TextEditor editor) {
+        if (!history.isEmpty()) {
+            editor.restore(history.pop());
+        }
+    }
+}
+package Task_410;
+
+public class Main {
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        TextEditorHistory history = new TextEditorHistory();
+
+        editor.type("Hello ");
+        history.save(editor);
+
+        editor.type("World!");
+        System.out.println("Content: " + editor.getContent());
+
+        history.undo(editor);
+        System.out.println("After undo: " + editor.getContent());
+    }
+}
+package Task_410;
+
+class TextMemento {
+    private String state;
+
+    public TextMemento(String state) {
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+}
+package Task_410;
+
+class TextEditor {
+    private String content = "";
+
+    public void type(String text) {
+        content += text;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public TextMemento save() {
+        return new TextMemento(content);
+    }
+
+    public void restore(TextMemento memento) {
+        content = memento.getState();
+    }
+}
